@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>DPX</title>
+<meta name="theme-color" content="#12161f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600&display=swap">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root{
+  --bg:#eef1f5; --surface:#ffffff; --ink:#1d2433; --muted:#5f6878;
+  --line:#d8dde6; --accent:#3f5e8c; --accent-soft:#dfe6f1; --glow:#8fa7c9; --danger:#b23b3b;
+  --display:"Young Serif",Georgia,"Times New Roman",serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#12161f; --surface:#1b212d; --ink:#e7eaf0; --muted:#9aa3b3;
+  --line:#2b3342; --accent:#9db4d8; --accent-soft:#25304a; --glow:#4d6690; --danger:#e07a7a; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding-block:20px 190px}
+h1,h2{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.screen{min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;text-align:center;padding-block:24px}
+.orb{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 40% 35%,var(--accent-soft),var(--glow));animation:breathe 8s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(.86);opacity:.75}50%{transform:scale(1);opacity:1}}
+.screen h1{font-size:2.2rem}
+.tag{font-family:var(--body);font-size:.75rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.screen .tag{margin-top:-14px}
+.screen p{margin:0;color:var(--muted);max-width:32ch}
+.screen form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px}
+.field{width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:1.05rem;text-align:center;letter-spacing:.08em}
+.btn{padding:14px 18px;border:0;border-radius:12px;background:var(--accent);color:var(--bg);font-weight:600;width:100%;max-width:300px}
+.btn:disabled{opacity:.6}
+.link{background:none;border:0;color:var(--muted);font-size:.88rem;text-decoration:underline;padding:6px}
+.err{color:var(--danger);font-size:.9rem;min-height:1.3em}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+header h1{font-size:1.6rem;line-height:1.2}
+header .tag{display:block;margin-top:2px}
+.ghost{background:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px;color:var(--muted);font-size:.9rem;flex:none}
+.tabs{display:flex;gap:6px;margin-bottom:22px;border-bottom:1px solid var(--line)}
+.tab{background:none;border:0;padding:10px 4px;margin-right:14px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--accent)}
+.upload{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 16px;border:1.5px dashed var(--glow);border-radius:16px;text-align:center;cursor:pointer;background:var(--accent-soft)}
+.upload strong{color:var(--accent)}
+.upload span{color:var(--muted);font-size:.88rem}
+.upload input{position:absolute;width:1px;height:1px;opacity:0}
+.upload:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.status{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--accent-soft);font-size:.9rem}
+.prog{height:4px;border-radius:2px;background:var(--line);margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+.label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:26px 0 10px;display:flex;justify-content:space-between;gap:8px}
+.label button{background:none;border:0;color:var(--accent);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;padding:0}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.play{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.item.active .play{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.meta{flex:1;min-width:0}
+.name{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.sub b{font-weight:500;color:var(--accent)}
+.del{flex:none;background:none;border:0;color:var(--muted);padding:8px;font-size:.85rem}
+.confirm{display:flex;gap:6px;flex:none}
+.confirm button{border:0;border-radius:8px;padding:6px 10px;font-size:.82rem}
+.yes{background:var(--danger);color:var(--bg)}
+.no{background:var(--accent-soft)}
+.empty{text-align:center;color:var(--muted);padding:28px 8px}
+.empty h2{font-size:1.2rem;color:var(--ink);margin-bottom:6px}
+.empty p{margin:0}
+.note{font-size:.8rem;color:var(--muted);margin-top:22px}
+
+.player{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);
+  padding:12px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-shadow:0 -8px 24px rgb(0 0 0 / .08)}
+.pin{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+video{width:100%;max-height:38vh;border-radius:12px;background:#000}
+.ptitle{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.seek{display:flex;align-items:center;gap:10px;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.seek input{flex:1;accent-color:var(--accent)}
+.ctrls{display:flex;justify-content:center;align-items:center;gap:18px}
+.skip{background:none;border:0;color:var(--muted);font-size:.85rem;padding:8px}
+.big{width:58px;height:58px;border-radius:50%;border:0;background:var(--accent);color:var(--bg);display:grid;place-items:center}
+@media (prefers-reduced-motion:reduce){.orb{animation:none}}
+</style>
+</head>
+<body>
+
+<!-- Entrar com Google -->
+<section class="screen" id="login" hidden>
+  <div class="orb" aria-hidden="true"></div>
+  <h1>DPX</h1>
+  <div class="tag">Desenvolvimento Pessoal 10</div>
+  <p id="loginMsg">Entre com sua conta Google para acessar suas meditações no Drive.</p>
+  <button class="btn" id="loginBtn" type="button">Entrar com Google</button>
+  <div class="err" id="loginErr" role="alert"></div>
+</section>
+
+<!-- Senha -->
+<section class="screen" id="lock" hidden>
+  <div class="orb" aria-hidden="true"></div>
+  <h1>DPX</h1>
+  <div class="tag">Desenvolvimento Pessoal 10</div>
+  <p id="lockMsg">Digite sua senha para entrar.</p>
+  <form id="lockForm" autocomplete="off">
+    <input class="field" id="pw1" type="password" placeholder="Senha" aria-label="Senha" required>
+    <input class="field" id="pw2" type="password" placeholder="Repita a senha" aria-label="Repita a senha" hidden>
+    <button class="btn" id="lockBtn" type="submit">Entrar</button>
+    <div class="err" id="lockErr" role="alert"></div>
+  </form>
+</section>
+
+<!-- Carregando -->
+<section class="screen" id="loading">
+  <div class="orb" aria-hidden="true"></div>
+  <h1>DPX</h1>
+  <p id="loadMsg">Abrindo…</p>
+</section>
+
+<!-- App -->
+<div class="wrap" id="app" hidden>
+  <header>
+    <h1>DPX <span class="tag">Desenvolvimento Pessoal 10</span></h1>
+    <button class="ghost" id="lockNow" type="button">Bloquear</button>
+  </header>
+  <nav class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" type="button">Meditações</button>
+  </nav>
+
+  <label class="upload" for="file">
+    <strong>Adicionar áudio ou vídeo</strong>
+    <span>Salvo na pasta “DPX” do seu Google Drive</span>
+    <input id="file" type="file" accept="audio/*,video/*" multiple>
+  </label>
+  <div class="status" id="status" role="status" hidden><span id="statusText"></span><div class="prog" id="prog" hidden><i id="progBar"></i></div></div>
+
+  <div class="label"><span id="count">Sua biblioteca</span><button id="refresh" type="button">Atualizar</button></div>
+  <ul class="list" id="list"></ul>
+  <div class="empty" id="empty">
+    <h2>Nenhuma meditação ainda</h2>
+    <p>Toque em “Adicionar áudio ou vídeo” para enviar sua primeira meditação guiada.</p>
+  </div>
+  <p class="note">Arquivos com <b style="color:var(--accent);font-weight:500">neste celular</b> já foram baixados e tocam sem internet.</p>
+  <p class="note"><button class="link" id="logout" type="button">Sair da conta Google</button></p>
+</div>
+
+<!-- Player -->
+<div class="player" id="player" hidden>
+  <div class="pin">
+    <video id="vid" playsinline hidden></video>
+    <audio id="aud" hidden></audio>
+    <div class="ptitle" id="ptitle"></div>
+    <div class="seek">
+      <span id="cur">0:00</span>
+      <input id="bar" type="range" min="0" max="100" step="0.1" value="0" aria-label="Posição">
+      <span id="dur">0:00</span>
+    </div>
+    <div class="ctrls">
+      <button class="skip" id="back" type="button" aria-label="Voltar 15 segundos">−15s</button>
+      <button class="big" id="toggle" type="button" aria-label="Tocar"></button>
+      <button class="skip" id="fwd" type="button" aria-label="Avançar 15 segundos">+15s</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const CLIENT_ID='350424342362-kjmlkfbp1gan8trqurpe0m7ogojumfa1.apps.googleusercontent.com';
+const SCOPE='https://www.googleapis.com/auth/drive.file';
+const API='https://www.googleapis.com/drive/v3';
+const UPLOAD='https://www.googleapis.com/upload/drive/v3/files';
+const CONFIG='dpx-config.json';
+
+const $=id=>document.getElementById(id);
+const ICON_PLAY='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+const ICON_PAUSE='<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+
+function show(id){for(const s of ['login','lock','loading','app'])$(s).hidden=s!==id;if(id!=='app')$('player').hidden=true}
+
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+/* ---------- Login Google ---------- */
+let token=null,tokenClient=null,pending=null;
+try{const t=JSON.parse(ls.get('dpx-token')||'null');if(t&&t.exp>Date.now()+60000)token=t.v}catch(e){}
+
+function initGIS(){
+  if(tokenClient)return true;
+  if(!(window.google&&google.accounts&&google.accounts.oauth2))return false;
+  tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,callback:r=>{
+    if(r.error){pending&&pending.rej(r);pending=null;return}
+    token=r.access_token;ls.set('dpx-token',JSON.stringify({v:token,exp:Date.now()+(r.expires_in-60)*1000}));
+    pending&&pending.res(token);pending=null;
+  },error_callback:e=>{pending&&pending.rej(e);pending=null}});
+  return true;
+}
+function requestToken(prompt){
+  return new Promise((res,rej)=>{
+    if(!initGIS()){rej({type:'gis'});return}
+    pending={res,rej};tokenClient.requestAccessToken({prompt});
+  });
+}
+function needLogin(msg){token=null;ls.del('dpx-token');show('login');$('loginErr').textContent=msg||''}
+$('loginBtn').onclick=async()=>{
+  $('loginErr').textContent='';$('loginBtn').disabled=true;
+  try{await requestToken(ls.get('dpx-folder')?'':'consent');await afterLogin()}
+  catch(e){$('loginErr').textContent=e&&e.type==='gis'?'O Google ainda está carregando. Verifique a internet e tente de novo.':'Não foi possível entrar. Tente de novo.'}
+  $('loginBtn').disabled=false;
+};
+
+async function api(url,opts={},retry=true){
+  const r=await fetch(url,{...opts,headers:{...(opts.headers||{}),Authorization:'Bearer '+token}});
+  if(r.status===401&&retry){
+    try{await requestToken('');return api(url,opts,false)}catch(e){needLogin('Sua sessão expirou. Entre de novo.');throw e}
+  }
+  if(!r.ok)throw {status:r.status};
+  return r;
+}
+
+/* ---------- Pasta e configuração no Drive ---------- */
+let folderId=ls.get('dpx-folder'),configId=null,pwHash=null;
+async function ensureFolder(){
+  if(folderId){
+    try{const r=await api(API+'/files/'+folderId+'?fields=id,trashed');const f=await r.json();if(!f.trashed)return}catch(e){if(e.status!==404)throw e}
+  }
+  const q=encodeURIComponent("name='DPX' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  const l=await (await api(API+'/files?q='+q+'&fields=files(id)&spaces=drive')).json();
+  if(l.files&&l.files.length)folderId=l.files[0].id;
+  else{
+    const c=await (await api(API+'/files?fields=id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'DPX',mimeType:'application/vnd.google-apps.folder'})})).json();
+    folderId=c.id;
+  }
+  ls.set('dpx-folder',folderId);
+}
+async function loadConfig(){
+  const q=encodeURIComponent(`name='${CONFIG}' and '${folderId}' in parents and trashed=false`);
+  const l=await (await api(API+'/files?q='+q+'&fields=files(id)')).json();
+  if(l.files&&l.files.length){
+    configId=l.files[0].id;
+    try{const c=await (await api(API+'/files/'+configId+'?alt=media')).json();pwHash=c.pwHash||null}catch(e){pwHash=null}
+  }else{configId=null;pwHash=null}
+  if(pwHash)ls.set('dpx-pw',pwHash);
+}
+async function saveConfig(){
+  const body=JSON.stringify({pwHash});
+  if(configId){await api(UPLOAD+'/'+configId+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body});return}
+  const b='dpx'+Math.random().toString(36).slice(2);
+  const meta=JSON.stringify({name:CONFIG,parents:[folderId],mimeType:'application/json'});
+  const r=await api(UPLOAD+'?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},
+    body:`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${body}\r\n--${b}--`});
+  configId=(await r.json()).id;
+}
+
+async function afterLogin(){
+  show('loading');$('loadMsg').textContent='Abrindo sua pasta no Drive…';
+  try{await ensureFolder();await loadConfig()}
+  catch(e){
+    if(!token)return;
+    // sem internet: usa a senha salva no aparelho e só os arquivos baixados
+    pwHash=ls.get('dpx-pw');offline=true;
+    if(!pwHash){needLogin('Não foi possível acessar o Drive. Verifique a internet e tente de novo.');return}
+  }
+  setupLock();
+}
+
+/* ---------- Senha ---------- */
+let creating=false,offline=false;
+async function hash(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('dpx:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+function setupLock(){
+  show('lock');creating=!pwHash;$('pw1').value='';$('pw2').value='';$('lockErr').textContent='';
+  $('lockMsg').textContent=creating?'Crie uma senha para proteger suas meditações.':'Digite sua senha para entrar.';
+  $('pw2').hidden=!creating;$('pw2').required=creating;$('lockBtn').textContent=creating?'Criar senha':'Entrar';
+}
+$('lockForm').addEventListener('submit',async e=>{
+  e.preventDefault();const p=$('pw1').value;
+  if(creating){
+    if(p.length<4){$('lockErr').textContent='Use pelo menos 4 caracteres.';return}
+    if(p!==$('pw2').value){$('lockErr').textContent='As senhas não são iguais. Digite de novo.';return}
+    pwHash=await hash(p);
+    try{await saveConfig()}catch(err){pwHash=null;$('lockErr').textContent='Não foi possível salvar a senha no Drive. Tente de novo.';return}
+    ls.set('dpx-pw',pwHash);unlock();
+  }else{
+    if(await hash(p)===pwHash)unlock();
+    else{$('lockErr').textContent='Senha incorreta. Tente novamente.';$('pw1').value='';$('pw1').focus()}
+  }
+});
+function unlock(){show('app');loadList()}
+$('lockNow').onclick=()=>{stop();setupLock();$('pw1').focus()};
+$('logout').onclick=()=>{
+  stop();try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
+  ls.del('dpx-folder');ls.del('dpx-pw');folderId=null;pwHash=null;needLogin('');
+};
+
+/* ---------- Cache no aparelho (IndexedDB) ---------- */
+let idb=null;
+function openIDB(){return new Promise(r=>{try{const q=indexedDB.open('dpx',1);q.onupgradeneeded=()=>q.result.createObjectStore('blobs');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}})}
+const cacheGet=id=>new Promise(r=>{if(!idb)return r(null);const q=idb.transaction('blobs').objectStore('blobs').get(id);q.onsuccess=()=>r(q.result||null);q.onerror=()=>r(null)});
+const cachePut=(id,v)=>new Promise(r=>{if(!idb)return r();const q=idb.transaction('blobs','readwrite').objectStore('blobs').put(v,id);q.onsuccess=q.onerror=()=>r()});
+const cacheDel=id=>new Promise(r=>{if(!idb)return r();const q=idb.transaction('blobs','readwrite').objectStore('blobs').delete(id);q.onsuccess=q.onerror=()=>r()});
+const cacheKeys=()=>new Promise(r=>{if(!idb)return r([]);const q=idb.transaction('blobs').objectStore('blobs').getAllKeys();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])});
+const cacheAll=()=>new Promise(r=>{if(!idb)return r([]);const q=idb.transaction('blobs').objectStore('blobs').getAll();q.onsuccess=()=>r(q.result);q.onerror=()=>r([])});
+
+/* ---------- Lista ---------- */
+let items=[],cached=new Set(),currentId=null,loadingId=null;
+function status(t,p){$('status').hidden=!t;$('statusText').textContent=t||'';$('prog').hidden=p==null;if(p!=null)$('progBar').style.width=Math.round(p*100)+'%'}
+async function loadList(){
+  cached=new Set(await cacheKeys());
+  if(offline){
+    items=(await cacheAll()).map(x=>x.meta).filter(Boolean).sort((a,b)=>b.createdTime.localeCompare(a.createdTime));
+    status('Sem internet: mostrando só o que já está neste celular.');render();return;
+  }
+  try{
+    const q=encodeURIComponent(`'${folderId}' in parents and trashed=false and name!='${CONFIG}'`);
+    const l=await (await api(API+'/files?q='+q+'&orderBy=createdTime desc&pageSize=1000&fields=files(id,name,mimeType,size,createdTime)')).json();
+    items=(l.files||[]).filter(f=>/^(audio|video)\//.test(f.mimeType)||/\.(mp3|m4a|aac|wav|ogg|mp4|mov|webm)$/i.test(f.name));
+  }catch(e){if(token)status('Não foi possível carregar a lista. Toque em Atualizar.')}
+  render();
+}
+$('refresh').onclick=()=>{offline=false;status('');loadList()};
+
+const fmtSize=b=>{b=+b||0;return b>1048576?(b/1048576).toFixed(1).replace('.',',')+' MB':Math.max(1,Math.round(b/1024))+' KB'};
+const fmtTime=s=>{if(!isFinite(s))return '0:00';s=Math.floor(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x};
+const isVideo=it=>/^video\//.test(it.mimeType)||/\.(mp4|mov|webm)$/i.test(it.name)&&!/^audio\//.test(it.mimeType);
+const title=n=>n.replace(/\.[^.]+$/,'');
+
+function render(){
+  const list=$('list');list.innerHTML='';
+  $('empty').hidden=items.length>0;
+  $('count').textContent=items.length?items.length+(items.length===1?' item':' itens')+' no Drive':'Sua biblioteca';
+  for(const it of items){
+    const li=document.createElement('li');li.className='item'+(it.id===currentId?' active':'');
+    const playing=it.id===currentId&&media&&!media.paused;
+    li.innerHTML=`<button class="play" type="button" aria-label="Tocar">${it.id===loadingId?'…':playing?ICON_PAUSE:ICON_PLAY}</button>
+      <div class="meta"><div class="name"></div><div class="sub">${isVideo(it)?'Vídeo':'Áudio'} · ${fmtSize(it.size)}${cached.has(it.id)?' · <b>neste celular</b>':''}</div></div>
+      ${offline?'':'<button class="del" type="button">Excluir</button>'}`;
+    li.querySelector('.name').textContent=title(it.name);
+    li.querySelector('.play').onclick=()=>it.id===currentId?toggle():play(it);
+    const d=li.querySelector('.del');
+    if(d)d.onclick=()=>{
+      const c=document.createElement('div');c.className='confirm';
+      c.innerHTML='<button class="yes" type="button">Excluir</button><button class="no" type="button">Cancelar</button>';
+      d.replaceWith(c);
+      c.querySelector('.no').onclick=render;
+      c.querySelector('.yes').onclick=async()=>{
+        if(it.id===currentId)stop();
+        try{
+          await api(API+'/files/'+it.id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({trashed:true})});
+          await cacheDel(it.id);items=items.filter(x=>x.id!==it.id);cached.delete(it.id);status('“'+title(it.name)+'” foi para a lixeira do Drive.');render();
+        }catch(e){status('Não foi possível excluir. Tente de novo.')}
+      };
+    };
+    list.appendChild(li);
+  }
+}
+
+/* ---------- Envio para o Drive ---------- */
+function guessType(f){
+  if(f.type)return f.type;
+  return ({mp3:'audio/mpeg',m4a:'audio/mp4',aac:'audio/aac',wav:'audio/wav',ogg:'audio/ogg',mp4:'video/mp4',mov:'video/quicktime',webm:'video/webm'})[(f.name.split('.').pop()||'').toLowerCase()]||'application/octet-stream';
+}
+function xhrSend(method,url,headers,body,onp){
+  return new Promise((res,rej)=>{
+    const x=new XMLHttpRequest();x.open(method,url);
+    for(const k in headers)x.setRequestHeader(k,headers[k]);
+    x.upload.onprogress=e=>e.lengthComputable&&onp(e.loaded/e.total);
+    x.onload=()=>x.status<300?res(JSON.parse(x.responseText||'{}')):rej({status:x.status});
+    x.onerror=()=>rej({status:0});x.send(body);
+  });
+}
+async function uploadFile(f,onp){
+  const type=guessType(f);
+  const meta={name:f.name,parents:[folderId],mimeType:type};
+  const fields='fields=id,name,mimeType,size,createdTime';
+  // envio retomável (bom para arquivos grandes)
+  const r=await api(UPLOAD+'?uploadType=resumable&'+fields,{method:'POST',headers:{'Content-Type':'application/json; charset=UTF-8','X-Upload-Content-Type':type,'X-Upload-Content-Length':String(f.size)},body:JSON.stringify(meta)});
+  const loc=r.headers.get('Location');
+  if(loc)return xhrSend('PUT',loc,{'Content-Type':type},f,onp);
+  // alternativa: envio em uma parte só
+  const b='dpx'+Math.random().toString(36).slice(2);
+  const body=new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: ${type}\r\n\r\n`,f,`\r\n--${b}--`]);
+  return xhrSend('POST',UPLOAD+'?uploadType=multipart&'+fields,{'Content-Type':'multipart/related; boundary='+b,Authorization:'Bearer '+token},body,onp);
+}
+$('file').addEventListener('change',async e=>{
+  const files=[...e.target.files];e.target.value='';
+  for(const f of files){
+    status('Enviando “'+title(f.name)+'” ('+fmtSize(f.size)+')…',0);
+    try{
+      const meta=await uploadFile(f,p=>status('Enviando “'+title(f.name)+'”… '+Math.round(p*100)+'%',p));
+      await cachePut(meta.id,{meta,blob:f});cached.add(meta.id);
+      items=[meta,...items.filter(x=>x.id!==meta.id)];render();
+      status('“'+title(f.name)+'” foi salvo no seu Drive.');
+    }catch(err){
+      status(err&&err.status===403?'Seu Google Drive está sem espaço ou bloqueou o envio.':'Não foi possível enviar “'+title(f.name)+'”. Verifique a internet e tente de novo.');
+    }
+  }
+});
+
+/* ---------- Player ---------- */
+let media=null,url=null;
+async function download(it){
+  const r=await api(API+'/files/'+it.id+'?alt=media');
+  const total=+(r.headers.get('Content-Length')||it.size||0);
+  if(!r.body||!total)return r.blob();
+  const reader=r.body.getReader(),parts=[];let got=0;
+  for(;;){const {done,value}=await reader.read();if(done)break;parts.push(value);got+=value.length;status('Baixando “'+title(it.name)+'”… '+Math.round(got/total*100)+'%',got/total)}
+  return new Blob(parts,{type:it.mimeType});
+}
+async function play(it){
+  stop();loadingId=it.id;render();
+  let blob=null;const c=await cacheGet(it.id);
+  if(c&&c.blob)blob=c.blob;
+  else{
+    status('Baixando “'+title(it.name)+'”…',0);
+    try{blob=await download(it);await cachePut(it.id,{meta:it,blob});cached.add(it.id);status('')}
+    catch(e){loadingId=null;if(token)status('Não foi possível abrir este arquivo. Verifique a internet.');render();return}
+  }
+  if(loadingId!==it.id)return;
+  loadingId=null;currentId=it.id;
+  if(!blob.type||blob.type==='application/octet-stream')blob=new Blob([blob],{type:it.mimeType});
+  url=URL.createObjectURL(blob);
+  const v=isVideo(it);media=v?$('vid'):$('aud');$('vid').hidden=!v;
+  media.src=url;$('ptitle').textContent=title(it.name);$('player').hidden=false;
+  media.ontimeupdate=()=>{$('cur').textContent=fmtTime(media.currentTime);if(media.duration)$('bar').value=media.currentTime/media.duration*100};
+  media.onloadedmetadata=()=>$('dur').textContent=fmtTime(media.duration);
+  media.onplay=media.onpause=media.onended=sync;
+  if('mediaSession' in navigator)navigator.mediaSession.metadata=new MediaMetadata({title:title(it.name),artist:'DPX',artwork:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]});
+  media.play().catch(()=>{});
+  sync();
+}
+function stop(){
+  if(media){media.pause();media.removeAttribute('src');media.load()}
+  if(url){URL.revokeObjectURL(url);url=null}
+  media=null;currentId=null;loadingId=null;$('player').hidden=true;$('vid').hidden=true;
+}
+function toggle(){if(!media)return;media.paused?media.play():media.pause()}
+function sync(){
+  const p=media&&!media.paused;$('toggle').innerHTML=(p?ICON_PAUSE:ICON_PLAY).replace(/18/g,'24');
+  $('toggle').setAttribute('aria-label',p?'Pausar':'Tocar');render();
+}
+$('toggle').onclick=toggle;
+$('back').onclick=()=>{if(media)media.currentTime=Math.max(0,media.currentTime-15)};
+$('fwd').onclick=()=>{if(media)media.currentTime=Math.min(media.duration||0,media.currentTime+15)};
+$('bar').oninput=e=>{if(media&&media.duration)media.currentTime=e.target.value/100*media.duration};
+
+/* ---------- Início ---------- */
+(async()=>{
+  idb=await openIDB();
+  if(token&&folderId)afterLogin();
+  else if(!navigator.onLine&&ls.get('dpx-pw')){pwHash=ls.get('dpx-pw');offline=true;setupLock()}
+  else show('login');
+})();
+</script>
+</body>
+</html>
