@@ -1,5 +1,5 @@
 // DPX – guarda a "casca" do app para abrir rápido e sem internet.
-const CACHE = 'dpx-v1';
+const CACHE = 'dpx-v2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
